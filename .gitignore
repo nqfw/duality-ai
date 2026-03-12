@@ -1,0 +1,16 @@
+# Dataset
+Offroad_Segmentation_Training_Dataset/
+Offroad_Segmentation_testImages/
+
+# Local checkpoints & logs
+checkpoints_segformer/
+optimized_stats/
+test_predictions/
+train_stats/
+*.pth
+!best_segformer.pth
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
