@@ -18,6 +18,7 @@ import os
 import time
 
 # ── Config ──────────────────────────────────────────────────────
+W, H = 336, 196
 W, H = 784, 448
 N_CLASSES = 10
 CLASS_NAMES = ["Trees", "Lush Bushes", "Dry Grass", "Dry Bushes", "Ground Clutter",
