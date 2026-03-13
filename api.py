@@ -120,6 +120,20 @@ def ensemble_predict(img_tensor):
 
     # Boost DINO to 75% as requested, Segformer 25%
     blended = 0.75 * dino_avg + 0.25 * seg_avg
+
+    # ── Heuristic: Flower-to-Rock Flipper ───────────────────────
+    # In desert terrain, 'Flowers' (pink) are often misclassified rocks.
+    # Penalize Flowers in the bottom 70% of the image and favor Rocks/Bushes.
+    _, C, h, w = blended.shape
+    y_coords = torch.linspace(0, 1, h, device=DEVICE).view(1, 1, h, 1)
+    ground_mask = (y_coords > 0.35).float() 
+    
+    flowers_prob = blended[:, 5:6, :, :]
+    blended[:, 5:6, :, :] -= (flowers_prob * 0.85 * ground_mask) # 85% penalty
+    blended[:, 7:8, :, :] += (flowers_prob * 0.60 * ground_mask) # Reassign to Rocks
+    blended[:, 3:4, :, :] += (flowers_prob * 0.25 * ground_mask) # Reassign to Dry Bushes
+    # ────────────────────────────────────────────────────────────
+
     return blended.squeeze(0)
 
 def colorize(pred_mask: np.ndarray) -> Image.Image:
