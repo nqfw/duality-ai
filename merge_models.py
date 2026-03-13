@@ -96,7 +96,7 @@ def compute_iou(pred, target):
 # 3. Ensemble Inference Logic
 # ==========================================
 
-def ensemble_inference(image, dino_backbone, dino_head, segformer, weights=[0.4, 0.6]):
+def ensemble_inference(image, dino_backbone, dino_head, segformer, weights=[0.75, 0.25]):
     """
     weights[0]: DINOv2 weight (0.51 mIoU)
     weights[1]: Segformer weight (0.59 mIoU)
@@ -130,7 +130,10 @@ def ensemble_inference(image, dino_backbone, dino_head, segformer, weights=[0.4,
     final_prob_seg = (prob_seg[0] + prob_seg[1]) / 2.0
 
     # Weighted Blend of Probabilities
+    # DINO is strong on individual classes, Segformer on structure.
+    # 75% DINOv2 + 25% Segformer blend
     blended_probs = (weights[0] * final_prob_dino) + (weights[1] * final_prob_seg)
+
     return blended_probs.unsqueeze(0)
 
 def main():

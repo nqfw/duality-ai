@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Offroad Semantic Segmentation AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  *{font-family:'Space Grotesk',sans-serif;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:#03020a;color:#e2e8f0;overflow-x:hidden;margin:0;}
+  .mono{font-family:'Space Mono',monospace;}
+  .glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.07);}
+  .cyan{color:#00D4FF;}
+  .purple{color:#7B61FF;}
+  .green{color:#00FF88;}
+  .cyan-bg{background:#00D4FF;}
+  .gradient-text{background:linear-gradient(135deg,#00D4FF 0%,#7B61FF 50%,#00FF88 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+  .glow-cyan{box-shadow:0 0 40px rgba(0,212,255,0.15);}
+  .glow-purple{box-shadow:0 0 40px rgba(123,97,255,0.15);}
+  .grid-lines{background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:80px 80px;}
+  #globe-canvas{position:absolute;top:0;right:0;width:55%;height:100%;z-index:1;}
+  .hero-content{position:relative;z-index:2;}
+  .nav-link{color:#94a3b8;transition:color 0.2s;}
+  .nav-link:hover{color:#00D4FF;}
+  .tag{background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);color:#00D4FF;font-size:0.65rem;padding:3px 10px;border-radius:999px;letter-spacing:0.08em;font-family:'Space Mono',monospace;}
+  .feature-card{transition:all 0.3s;cursor:default;}
+  .feature-card:hover{transform:translateY(-5px);border-color:rgba(0,212,255,0.3);box-shadow:0 20px 60px rgba(0,212,255,0.08);}
+  .launch-btn{background:linear-gradient(135deg,#00D4FF,#7B61FF);color:#000;font-weight:700;letter-spacing:0.02em;transition:all 0.3s;}
+  .launch-btn:hover{opacity:0.9;transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,212,255,0.35);}
+  .outline-btn{border:1px solid rgba(0,212,255,0.4);color:#00D4FF;transition:all 0.3s;}
+  .outline-btn:hover{background:rgba(0,212,255,0.08);border-color:#00D4FF;}
+  .stat-big{font-size:3.5rem;font-weight:700;line-height:1;font-family:'Space Mono',monospace;}
+  @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  .float{animation:float 5s ease-in-out infinite;}
+  .arch-node{background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.25);border-radius:12px;padding:16px 20px;text-align:center;transition:all 0.3s;}
+  .arch-node:hover{background:rgba(0,212,255,0.12);border-color:#00D4FF;}
+  .arrow{color:#7B61FF;font-size:1.5rem;flex-shrink:0;}
+  .hero-section{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;}
+  .hero-gradient{background:radial-gradient(ellipse 80% 80% at 20% 50%,rgba(0,212,255,0.06) 0%,rgba(123,97,255,0.04) 50%,transparent 100%);}
+</style>
+</head>
+<body class="grid-lines">
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50 glass px-10 py-4 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <div class="w-9 h-9 rounded-lg flex items-center justify-center font-black text-sm text-black" style="background:linear-gradient(135deg,#00D4FF,#7B61FF)">AI</div>
+    <div>
+      <div class="font-bold text-sm tracking-wide">DESERT ATLAS AI</div>
+      <div class="text-xs text-slate-500 mono">v2.1 · mIoU 61.42%</div>
+    </div>
+  </div>
+  <div class="hidden md:flex items-center gap-8 text-sm">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#performance" class="nav-link">Performance</a>
+    <a href="#architecture" class="nav-link">Architecture</a>
+    <a href="#impact" class="nav-link">Research</a>
+  </div>
+  <a href="dashboard.html" class="launch-btn px-5 py-2 rounded-xl text-sm">Launch Dashboard →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero-section hero-gradient pt-20" id="hero">
+  <canvas id="globe-canvas"></canvas>
+  <div class="hero-content max-w-3xl px-10 md:px-16">
+    <div class="flex flex-wrap gap-2 mb-8">
+      <span class="tag">DUALITY AI HACKATHON 2025</span>
+      <span class="tag">mIoU 61.42% (VAL)</span>
+      <span class="tag" style="border-color:#ff980088; color:#ff9800">mIoU 25.36% (TEST)</span>
+      <span class="tag">39.7ms INFERENCE</span>
+    </div>
+    <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-[1.05]">
+      Offroad<br/>
+      <span class="gradient-text">Terrain AI</span><br/>
+      Segmentation
+    </h1>
+    <p class="text-lg text-slate-400 mb-10 leading-relaxed max-w-xl">
+      Autonomous terrain understanding powered by a DINOv2 + Segformer ensemble. Trained on synthetic desert environments, built for real-world offroad navigation.
+    </p>
+    <div class="flex flex-wrap gap-4">
+      <a href="dashboard.html" class="launch-btn px-8 py-4 rounded-xl text-base">▶ Launch AI Dashboard</a>
+      <a href="#features" class="outline-btn px-8 py-4 rounded-xl text-base">View Research</a>
+    </div>
+
+    <!-- Mini stats row -->
+    <div class="flex gap-8 mt-14">
+      <div>
+        <div class="mono text-2xl font-bold cyan">0.6142</div>
+        <div class="text-slate-500 text-xs mt-1">Val mIoU</div>
+      </div>
+      <div class="w-px bg-white/10"></div>
+      <div>
+        <div class="mono text-2xl font-bold purple">39.7ms</div>
+        <div class="text-slate-500 text-xs mt-1">Inference</div>
+      </div>
+      <div class="w-px bg-white/10"></div>
+      <div>
+        <div class="mono text-2xl font-bold green">10</div>
+        <div class="text-slate-500 text-xs mt-1">Classes</div>
+      </div>
+      <div class="w-px bg-white/10"></div>
+      <div>
+        <div class="mono text-2xl font-bold" style="color:#ff6b6b">2×</div>
+        <div class="text-slate-500 text-xs mt-1">Models</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section id="performance" class="py-28 px-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <span class="tag mb-5 inline-block">PERFORMANCE METRICS</span>
+      <h2 class="text-4xl font-bold mt-4">State-of-the-Art Results</h2>
+      <p class="text-slate-500 mt-3 text-sm">Measured on Duality AI's Offroad Segmentation dataset, 10 terrain classes</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-5">
+      <div class="glass rounded-2xl p-8 text-center glow-cyan feature-card">
+        <div class="stat-big cyan" id="stat-miou">0</div>
+        <div class="text-slate-400 text-sm mt-2">Val mIoU</div>
+        <div class="text-xs text-slate-600 mt-1 mono">Synthetic Data</div>
+      </div>
+      <div class="glass rounded-2xl p-8 text-center feature-card border-orange-400/30">
+        <div class="stat-big text-orange-400" id="stat-test-miou">0</div>
+        <div class="text-slate-400 text-sm mt-2">Test mIoU</div>
+        <div class="text-xs text-slate-600 mt-1 mono">Unseen Location</div>
+      </div>
+      <div class="glass rounded-2xl p-8 text-center feature-card">
+        <div class="stat-big purple" id="stat-speed">0</div>
+        <div class="text-slate-400 text-sm mt-2">Inference Speed</div>
+        <div class="text-xs text-slate-600 mt-1 mono">Per Image (ms)</div>
+      </div>
+      <div class="glass rounded-2xl p-8 text-center feature-card">
+        <div class="stat-big green" id="stat-classes">0</div>
+        <div class="text-slate-400 text-sm mt-2">Terrain Classes</div>
+        <div class="text-xs text-slate-600 mt-1 mono">Offroad Biomes</div>
+      </div>
+      <div class="glass rounded-2xl p-8 text-center feature-card">
+        <div class="stat-big" style="color:#ff6b6b" id="stat-images">0</div>
+        <div class="text-slate-400 text-sm mt-2">Training Images</div>
+        <div class="text-xs text-slate-600 mt-1 mono">Synthetic Base</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="py-28 px-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <span class="tag mb-5 inline-block">CAPABILITIES</span>
+      <h2 class="text-4xl font-bold mt-4">AI System Overview</h2>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="glass rounded-2xl p-8 feature-card">
+        <div class="w-12 h-12 rounded-xl mb-5 flex items-center justify-center text-2xl" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2)">🗺️</div>
+        <h3 class="text-lg font-semibold mb-3 cyan">Terrain Understanding</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">AI identifies terrain types — rocks, vegetation, sky, ground clutter, and obstacles with pixel-level precision across unseen environments.</p>
+      </div>
+      <div class="glass rounded-2xl p-8 feature-card">
+        <div class="w-12 h-12 rounded-xl mb-5 flex items-center justify-center text-2xl" style="background:rgba(123,97,255,0.1);border:1px solid rgba(123,97,255,0.2)">🚗</div>
+        <h3 class="text-lg font-semibold mb-3 purple">Autonomous Navigation</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Enables real-time safe path planning for offroad autonomous ground vehicles in complex desert and mixed-terrain environments.</p>
+      </div>
+      <div class="glass rounded-2xl p-8 feature-card">
+        <div class="w-12 h-12 rounded-xl mb-5 flex items-center justify-center text-2xl" style="background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.2)">🧠</div>
+        <h3 class="text-lg font-semibold mb-3 green">Ensemble Learning</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">DINOv2 ViT-B/14 combined with Segformer B2 via weighted TTA probability blending — +9% mIoU gain over individual models.</p>
+      </div>
+      <div class="glass rounded-2xl p-8 feature-card">
+        <div class="w-12 h-12 rounded-xl mb-5 flex items-center justify-center text-2xl" style="background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.2)">🔬</div>
+        <h3 class="text-lg font-semibold mb-3" style="color:#ff6b6b">Synthetic-to-Real</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Trained on Duality AI's Falcon platform with a full Albumentations pipeline — ElasticTransform, MotionBlur, ColorJitter for robust generalization.</p>
+      </div>
+      <div class="glass rounded-2xl p-8 feature-card">
+        <div class="w-12 h-12 rounded-xl mb-5 flex items-center justify-center text-2xl" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2)">⚡</div>
+        <h3 class="text-lg font-semibold mb-3 cyan">Sub-40ms Inference</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Achieves 39.7ms average inference at 336×196 — well within the competition's 50ms deployment benchmark for real-time use.</p>
+      </div>
+      <div class="glass rounded-2xl p-8 feature-card">
+        <div class="w-12 h-12 rounded-xl mb-5 flex items-center justify-center text-2xl" style="background:rgba(123,97,255,0.1);border:1px solid rgba(123,97,255,0.2)">📊</div>
+        <h3 class="text-lg font-semibold mb-3 purple">Research Analytics</h3>
+        <p class="text-slate-400 text-sm leading-relaxed">Full experiment tracking: per-class IoU, confusion matrix, training loss curves, failure case analysis, and inference speed benchmarks.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section id="architecture" class="py-28 px-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <span class="tag mb-5 inline-block">MODEL ARCHITECTURE</span>
+      <h2 class="text-4xl font-bold mt-4">Ensemble Pipeline</h2>
+    </div>
+    <div class="glass rounded-3xl p-10 glow-purple">
+      <div class="flex flex-col md:flex-row items-center justify-center gap-3 flex-wrap">
+        <div class="arch-node">
+          <div class="text-2xl mb-1">🖼️</div>
+          <div class="font-semibold text-sm">Input Image</div>
+          <div class="text-slate-500 text-xs mono mt-1">784×448px</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="arch-node" style="border-color:rgba(0,212,255,0.4);background:rgba(0,212,255,0.06)">
+          <div class="text-2xl mb-1">🔵</div>
+          <div class="font-semibold text-sm cyan">DINOv2 ViT-B/14</div>
+          <div class="text-slate-500 text-xs mono mt-1">weight: 0.40</div>
+        </div>
+        <div class="flex flex-col items-center gap-1 text-purple-400 text-sm font-mono">→ TTA+Blend →</div>
+        <div class="arch-node" style="border-color:rgba(123,97,255,0.4);background:rgba(123,97,255,0.06)">
+          <div class="text-2xl mb-1">🟣</div>
+          <div class="font-semibold text-sm purple">Segformer B2</div>
+          <div class="text-slate-500 text-xs mono mt-1">weight: 0.60</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="arch-node" style="border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.06)">
+          <div class="text-2xl mb-1">⊕</div>
+          <div class="font-semibold text-sm green">Softmax Blend</div>
+          <div class="text-slate-500 text-xs mono mt-1">HFlip TTA</div>
+        </div>
+        <div class="arrow">→</div>
+        <div class="arch-node" style="border-color:rgba(0,255,136,0.4);background:rgba(0,255,136,0.06)">
+          <div class="text-2xl mb-1">🗺️</div>
+          <div class="font-semibold text-sm green">Mask Output</div>
+          <div class="text-slate-500 text-xs mono mt-1">10 Classes</div>
+        </div>
+      </div>
+      <div class="mt-8 grid grid-cols-5 md:grid-cols-10 gap-2 text-center text-xs">
+        <div class="rounded-lg py-2 px-1" style="background:rgba(34,139,34,0.2);border:1px solid rgba(34,139,34,0.3)">Trees</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(0,200,80,0.2);border:1px solid rgba(0,200,80,0.3)">Bushes</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(210,180,140,0.2);border:1px solid rgba(210,180,140,0.3)">Grass</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(139,90,43,0.2);border:1px solid rgba(139,90,43,0.3)">Dry Bush</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(105,105,105,0.2);border:1px solid rgba(105,105,105,0.3)">Clutter</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(255,20,147,0.2);border:1px solid rgba(255,20,147,0.3)">Flowers</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(101,67,33,0.2);border:1px solid rgba(101,67,33,0.3)">Logs</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(128,128,128,0.2);border:1px solid rgba(128,128,128,0.3)">Rocks</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(194,178,128,0.2);border:1px solid rgba(194,178,128,0.3)">Land</div>
+        <div class="rounded-lg py-2 px-1" style="background:rgba(77,166,255,0.2);border:1px solid rgba(77,166,255,0.3)">Sky</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section id="impact" class="py-28 px-8">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <span class="tag mb-5 inline-block">RESEARCH IMPACT</span>
+      <h2 class="text-4xl font-bold mt-4">Real World Applications</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="glass rounded-2xl p-8 feature-card flex gap-5">
+        <div class="text-4xl flex-shrink-0">🤖</div>
+        <div><h3 class="text-lg font-semibold mb-2">Autonomous Ground Vehicles</h3><p class="text-slate-400 text-sm">Real-time terrain classification for UGV navigation in military, agriculture and mining offroad operations.</p></div>
+      </div>
+      <div class="glass rounded-2xl p-8 feature-card flex gap-5">
+        <div class="text-4xl flex-shrink-0">🌾</div>
+        <div><h3 class="text-lg font-semibold mb-2">Agricultural Robotics</h3><p class="text-slate-400 text-sm">Crop vs. terrain differentiation enabling precision agriculture robots to navigate complex field environments.</p></div>
+      </div>
+      <div class="glass rounded-2xl p-8 feature-card flex gap-5">
+        <div class="text-4xl flex-shrink-0">🚁</div>
+        <div><h3 class="text-lg font-semibold mb-2">Search & Rescue</h3><p class="text-slate-400 text-sm">Rapid terrain mapping for autonomous drones conducting search operations in remote desert environments.</p></div>
+      </div>
+      <div class="glass rounded-2xl p-8 feature-card flex gap-5">
+        <div class="text-4xl flex-shrink-0">🪐</div>
+        <div><h3 class="text-lg font-semibold mb-2">Planetary Exploration</h3><p class="text-slate-400 text-sm">Synthetic-to-real transfer learning directly applicable to Mars rovers navigating extraterrestrial desert terrain.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-28 px-8 text-center">
+  <div class="max-w-2xl mx-auto glass rounded-3xl p-16 glow-cyan">
+    <div class="text-5xl mb-6">🚀</div>
+    <h2 class="text-4xl font-bold mb-4">Try It Live</h2>
+    <p class="text-slate-400 mb-10 leading-relaxed">Upload any offroad terrain image and watch our GPU segment every pixel in under 40ms.</p>
+    <a href="dashboard.html" class="launch-btn inline-block px-10 py-5 rounded-xl text-xl">Launch AI Dashboard →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t border-white/5 py-10 px-8">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-600">
+    <div class="mono text-xs">© 2025 DESERT ATLAS AI · DUALITY AI HACKATHON</div>
+    <div class="flex gap-8 text-xs mono">
+      <a href="https://github.com/nqfw/duality-ai" class="hover:text-cyan-400 transition">GitHub</a>
+      <span>mIoU 61.4%</span>
+      <span>DINOv2 + Segformer B2</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── THREE.JS GLOBE ─────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('globe-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+  camera.position.z = 3;
+
+  function resize() {
+    renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+    camera.aspect = canvas.clientWidth / canvas.clientHeight;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const globeGroup = new THREE.Group();
+  scene.add(globeGroup);
+
+  // Wireframe sphere
+  const sphereGeo = new THREE.SphereGeometry(1, 36, 36);
+  const wireMat = new THREE.MeshBasicMaterial({
+    color: 0x00D4FF, wireframe: true, transparent: true, opacity: 0.08
+  });
+  globeGroup.add(new THREE.Mesh(sphereGeo, wireMat));
+
+  // Dot sphere
+  const dotCount = 3500;
+  const dotGeo = new THREE.BufferGeometry();
+  const positions = [];
+  for (let i = 0; i < dotCount; i++) {
+    const phi = Math.acos(2 * Math.random() - 1);
+    const theta = 2 * Math.PI * Math.random();
+    const r = 1.01;
+    positions.push(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.sin(phi) * Math.sin(theta),
+      r * Math.cos(phi)
+    );
+  }
+  dotGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  const dotMat = new THREE.PointsMaterial({ color: 0x00D4FF, size: 0.012, transparent: true, opacity: 0.7 });
+  globeGroup.add(new THREE.Points(dotGeo, dotMat));
+
+  // Glowing ring
+  const ringGeo = new THREE.TorusGeometry(1.15, 0.003, 8, 200);
+  const ringMat = new THREE.MeshBasicMaterial({ color: 0x7B61FF, transparent: true, opacity: 0.5 });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = Math.PI / 2.5;
+  globeGroup.add(ring);
+
+  // Second ring
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(1.25, 0.002, 8, 200),
+    new THREE.MeshBasicMaterial({ color: 0x00FF88, transparent: true, opacity: 0.3 })
+  );
+  ring2.rotation.x = Math.PI / 3.5;
+  ring2.rotation.y = Math.PI / 4;
+  globeGroup.add(ring2);
+
+  // Glow sphere
+  const glowGeo = new THREE.SphereGeometry(1.08, 32, 32);
+  const glowMat = new THREE.MeshBasicMaterial({ color: 0x00D4FF, transparent: true, opacity: 0.03, side: THREE.BackSide });
+  globeGroup.add(new THREE.Mesh(glowGeo, glowMat));
+
+  // Position globe to the right
+  globeGroup.position.x = 0.5;
+
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 0.5;
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    globeGroup.rotation.y += 0.002;
+    globeGroup.rotation.x += (mouseY * 0.3 - globeGroup.rotation.x) * 0.02;
+    globeGroup.rotation.y += (mouseX * 0.3 - globeGroup.rotation.y) * 0.005;
+    ring.rotation.z += 0.003;
+    ring2.rotation.z -= 0.002;
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+// ── GSAP ANIMATIONS ────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+gsap.from(".hero-content > *", { opacity:0, y:40, duration:1, stagger:0.15, ease:"power3.out", delay:0.3 });
+
+function animateCounter(id, target, suffix="", decimals=0) {
+  const el = document.getElementById(id);
+  let start = 0;
+  const step = 16;
+  const increment = target / (2000 / step);
+  const timer = setInterval(() => {
+    start += increment;
+    if (start >= target) { start = target; clearInterval(timer); }
+    el.textContent = decimals > 0 ? start.toFixed(decimals) + suffix : Math.floor(start) + suffix;
+  }, step);
+}
+
+ScrollTrigger.create({
+  trigger: "#performance", onEnter: () => {
+    animateCounter("stat-miou", 61.42, "%", 2);
+    animateCounter("stat-test-miou", 25.36, "%", 2);
+    animateCounter("stat-speed", 39.7, "ms", 1);
+    animateCounter("stat-classes", 10);
+    animateCounter("stat-images", 2856);
+  }, once: true
+});
+
+gsap.utils.toArray(".feature-card").forEach((card, i) => {
+  gsap.from(card, { scrollTrigger: { trigger: card, start: "top 88%" }, opacity:0, y:25, duration:0.6, delay:(i%3)*0.1 });
+});
+</script>
+</body>
+</html>
