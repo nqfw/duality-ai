@@ -1,4 +1,4 @@
-# 🌵 Desert Atlas AI: Offroad Terrain Segmentation
+# 🌵 Atlas AI: Offroad Terrain Segmentation
 
 **Validation mIoU: 61.42%** | **Official Test mIoU: 25.36%**
 
@@ -7,7 +7,7 @@
 [![Test-mIoU](https://img.shields.io/badge/Test--mIoU-25.36%25-orange.svg)](https://github.com/nqfw/duality-ai)
 [![Inference](https://img.shields.io/badge/Inference-39.7ms-purple.svg)](https://github.com/nqfw/duality-ai)
 
-**Desert Atlas AI** is an advanced offroad terrain understanding system developed for the **Duality AI Hackathon 2025**. It uses a deep ensemble of Vision Transformers (DINOv2) and Hierarchical Transformers (SegFormer) to segment complex desert and rocky environments for autonomous navigation.
+**Atlas AI** is an advanced offroad terrain understanding system developed for the **Duality AI Hackathon 2025**. It uses a deep ensemble of Vision Transformers (DINOv2) and Hierarchical Transformers (SegFormer) to segment complex desert and rocky environments for autonomous navigation.
 
 ---
 
