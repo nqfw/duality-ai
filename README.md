@@ -69,21 +69,23 @@ Simply open `web/index.html` in any modern browser to start interacting with the
 
 ---
 
-Developed by **nqfw** for **Duality AI 2025**.
-# DualityAI Offroad Segmentation Baseline - 0.4991 mIoU
-
+## DualityAI Offroad Segmentation Baseline - 0.6142 mIoU
 This repository contains the optimized training pipeline for the DualityAI segmentation challenge.
 
-## 📊 Performance
-- **mIoU:** 0.4991 (Measured on `val/` set)
-- **Model:** SegFormer-B0
-- **Training Time:** ~12 minutes
-- **Hardware:** Optimized for 6GB VRAM (AMP + 320x320)
+### 📊 Performance
+- **mIoU:** 0.6142 (Measured on `val/` set)
+- **Official Test mIoU:** 0.2536 (Unseen Location)
+- **Model:** DINOv2 ViT-B/14 + SegFormer Ensemble
+- **Inference Speed:** 39.7ms (Optimized for Real-Time Deployment)
 
-## 🚀 Usage
+### 🚀 Usage
 1. Install dependencies: `pip install -r requirements.txt`
-2. Run training/inference: `python train_segmentation.py`
-3. Predictions are saved to `test_predictions/`
+2. Run training/inference: `python train_turbo_v3.py` or `python merge_models.py`
+3. Web Dashboard: Open `web/index.html` via local server or direct file access.
 
-## 🧠 Model Weights
-The best weights are saved in `best_segformer.pth`.
+### 🧠 Model Weights
+The best optimized weights are saved as `segmentation_head_turbo.pth` and `dino_backbone_turbo.pth`.
+
+---
+
+Submission for **Duality AI 2025**.
